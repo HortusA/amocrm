@@ -10,23 +10,31 @@ class IdCompany:
     def __init__(self, url=url_company, header=headers):
         self.url = url
         self.headers = header
-        self.response = requests.get(self.url, headers=self.headers)
+        self.response = None
+        self.result = None
 
-    def access_data(self):
-        self.result = self.response.json()
-        return self.result
+    def amo_data(self):
+        self.response = requests.get(self.url, headers=self.headers)
+        return self.response
+
+    def getting_data(self):
+        if self.amo_data().status_code == 200:
+            self.result = self.amo_data().json()
+            return self.result
+        else:
+            return 'Дотсупа нет'
 
     def show_status_cod(self):
-        print(self.response.status_code)
+        print(self.amo_data().status_code)
 
 
 class Dir:
-    def __init__(self, idcompany, col=0):
-        self.idcompany = idcompany
+    def __init__(self, company, col=0):
+        self.company = company
         self.col = col
 
     def show_id(self):
-        data_dict = self.idcompany['_embedded']['companies']
+        data_dict = self.company['_embedded']['companies']
         col = 0
         for i in data_dict:
             try:
