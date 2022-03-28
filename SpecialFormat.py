@@ -6,9 +6,9 @@ with open("index.html", "r") as file:
     contents = file.read()
     b = {}
     all_doc = BeautifulSoup(contents, 'lxml')
-    for i in all_doc.recursiveChildGenerator():
+    for i in all_doc:
 
-        if i.name == 'p':
+        if i == 'p':
             b.update({'абзац': i.text})
         elif i.name == 'figure':
             b.update({'jpg': i})
