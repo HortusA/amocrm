@@ -1,7 +1,7 @@
 
 from bs4 import BeautifulSoup
-import pprint, re
-import sqlite3
+import pprint, re, json, sqlite3
+
 
 
 conn = sqlite3.connect('/home/hortus/PycharmProjects/amocrm/app.db')
@@ -20,11 +20,18 @@ for string in result:
 
         if i.name == 'p':
             b.append({'paragraph': i.text})
-        elif i.name == 'figure':
+        elif i.name == 'figue':
             b.append({'jpeg': i})
+        elif i.name == 'h2':
+            b.append({'Тен h2': i.text})
+        elif i.name == 'Table':
+            b.append({'Тен h2': i})
         else:
             b.append({'неизвестный тег': i})
 
 
+
 pprint.pprint(b)
+
+
 conn.close()
