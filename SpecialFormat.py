@@ -9,21 +9,22 @@ cursor = conn.cursor()
 cursor.execute("SELECT content FROM cms_article_content ")
 result = cursor.fetchall()
 
-for r in result:
+b = []
+for string in result:
 
-    b = []
-    all_doc = BeautifulSoup(r, 'lxml')
-    for i in all_doc.body:
+
+    clr = re.sub(r"[\r\n\\r\\n]", "", string[0])
+    data_string = BeautifulSoup(clr, 'lxml')
+
+    for i in data_string.body:
+
         if i.name == 'p':
-            clr = re.sub(r"[\r\n\\r\\n]", "", i.text)
-            b.append({'paragraph' : clr})
+            b.append({'paragraph': i.text})
         elif i.name == 'figure':
             b.append({'jpeg': i})
         else:
-            clr = re.sub(r"[\r\n\\r\\n]", "", i)
-            b.append({'неизвестный тег': clr})
+            b.append({'неизвестный тег': i})
 
 
 pprint.pprint(b)
 conn.close()
-

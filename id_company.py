@@ -48,9 +48,4 @@ class Dir:
         
 a = IdCompany()
 a.show_status_cod()
-b = Dir(a.access_data())
-b.show_id()
-print(f'Мы вычислили корень квадратный из введенного вами числа.'
-      f'Это будет: {CalculateSquareRoot(your_number)}')
-
 

@@ -94,6 +94,10 @@ a = IdCompany()
 a.show_status_cod()
 b = Dir(a.access_data())
 b.show_id()
+sqlite_select_query = """SELECT * from cms_article_content"""
+cursor.execute(sqlite_select_query)
+records = cursor.fetchall()
+for st in records:
 
 
 
