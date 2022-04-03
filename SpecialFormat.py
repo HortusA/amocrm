@@ -5,12 +5,16 @@ import pprint, re, json, sqlite3
 
 conn = sqlite3.connect('/home/hortus/PycharmProjects/amocrm/app.db')
 cursor = conn.cursor()
-cursor.execute("SELECT content FROM cms_article_content limit 20")
+cursor.execute("SELECT content FROM cms_article_content limit 3")
 
 result = cursor.fetchall()
+list_root = []
+list_body = []
+coun = 0
 
-b = []
+
 for string in result:
+    coun =+ 1
 
     clr = re.sub(r"[\\\r\\\n]", "", string[0])
     data_string = BeautifulSoup(clr, 'lxml')
@@ -18,20 +22,21 @@ for string in result:
     for i in data_string.body:
 
         if i.name == 'p':
-            b.append({'paragraph': i.text})
+            list_body.append({f'"type" :paragraph': i.text})
 
         elif i.name == 'figure':
+                if str(i.contents[0]) != 'None':
+                    list_body.append({f'"type" :jpeg"': str(i.contents[0])})
 
-            b.append({'jpeg': i.contents[0].attrs['src']})
 
         elif i.name == 'h2':
-            b.append({'header': i.text})
+            list_body.append({f'"type" :h2': i.text})
 
         else:
-            b.append({'неизвестный тег': i.text})
+            list_body.append({f'"type" :unknown tag': i.text})
 
+    list_root.append({f' Number {coun},"blocks"': list_body})
+j = json.dumps(list_root)
 
-#j = json.dumps(b)
-
-pprint.pprint(b)
+pprint.pprint(list_root)
 
