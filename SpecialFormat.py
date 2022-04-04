@@ -2,21 +2,22 @@
 from bs4 import BeautifulSoup
 import pprint, re, json, sqlite3
 
+from flask import jsonify
 path_to_base = '/home/hortus/PycharmProjects/amocrm/app.db'
 
 
-
 class SearchArticles:
-
     def __init__(self, path_to_base):
         self.conn = sqlite3.connect(path_to_base)
         self.cursor = self.conn.cursor()
-        self.list_root = []
+        self.article_body = {}
         self.list_body = []
         self.count = 0
+        self.result = None
 
     def execute_one(self, article_id):
-        self.cursor.execute("SELECT content FROM cms_article_content WHERE article_id = ?", (article_id,))
+        self.article_id = article_id
+        self.cursor.execute("SELECT content FROM cms_article_content WHERE article_id = ?", (self.article_id,))
         self.result = self.cursor.fetchone()
         return self.result
 
@@ -25,36 +26,71 @@ class SearchArticles:
         self.result = self.cursor.fetchall()
         return self.result
 
-    def exrcute_metod(self, method):
-        self.result = method
-        for string in self.result:
-            self.count += 1
-            clr = re.sub(r"[\\\r\\\n]", "", string)
-            data_string = BeautifulSoup(clr, 'lxml')
+    def get_article_content(self):
+        self.cursor.execute("""SELECT a.date, ac.content FROM cms_article_content ac
+                            LEFT JOIN cms_articles a on a.article_id = ac.article_id""")
+        return self.cursor.fetchone()
 
-            for i in data_string.body:
+    def parse_content(self, date, content):
+        clr = re.sub(r"[\\\r\\\n]", "", content)
+        data_string = BeautifulSoup(clr, 'lxml')
 
-                if i.name == 'p':
-                    self.list_body.append({f'"type" :paragraph': i.text})
+        for i in data_string.body:
+            if i.name == 'p':
+                self.list_body.append({
+                        "type": "paragraph",
+                        "data": {
+                            "text": str(i.text),
+                            }
+                })
+            elif i.name == 'figure':
+                try:
+                    self.list_body.append(
+                        {
+                            "type": "image",
+                            "data": {
+                                "file": {
+                                    "url": str(i.contents[0])
+                                },
+                                "caption": "need to be correct parse",
+                                "withBorder": "false",
+                                "withBackground": "false",
+                                "stretched": "true"
+                            }
+                        }
+                                          )
+                except IndexError:
+                    print(f'отсутсвует значение{i}')
+            elif i.name == 'h2':
+                self.list_body.append(
+                        {
+                            "type": "header",
+                            "data": {
+                                "text": str(i.text),
+                                "level": 2
+                            }
+                        }
+                )
+            else:
+                #self.list_body.append({f'"type" :unknown tag': i.text})
+                pass
 
-                elif i.name == 'figure':
-                    try:
-                        self.list_body.append({f'"type" :jpeg"': str(i.contents[0])})
-                    except IndexError:
-                        print(f'отсутсвует значение{i}')
-                elif i.name == 'h2':
-                    self.list_body.append({f'"type" :h2': i.text})
+        self.article_body.update(
+            {
+                "time":  date,
+                "blocks": self.list_body,
+                "version": "0.01"
+             }
+        )
 
-                else:
-                    self.list_body.append({f'"type" :unknown tag': i.text})
-
-            self.list_root.append({f' Number {self.count},"blocks"': self.list_body})
-
-        pprint.pprint(self.list_root)
+        return self.article_body
 
 #j = json.dumps(list_root)
 
 
-a=SearchArticles('/home/hortus/PycharmProjects/amocrm/app.db')
-a.exrcute_metod(a.execute_one(10))
+a = SearchArticles('/home/hortus/PycharmProjects/amocrm/app.db')
+result = a.get_article_content()
+test = a.parse_content(date=result[0], content=result[1])
+print(json.dumps(test))
+
 
