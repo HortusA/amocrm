@@ -1,8 +1,9 @@
+import json
+import re
+import sqlite3
 
 from bs4 import BeautifulSoup
-import pprint, re, json, sqlite3
 
-from flask import jsonify
 path_to_base = '/home/hortus/PycharmProjects/amocrm/app.db'
 
 
@@ -28,7 +29,8 @@ class SearchArticles:
 
     def get_article_content(self):
         self.cursor.execute("""SELECT a.date, ac.content FROM cms_article_content ac
-                            LEFT JOIN cms_articles a on a.article_id = ac.article_id""")
+                            LEFT JOIN cms_articles a on a.article_id = ac.article_id
+                            WHERE a.article_id = 7""")
         return self.cursor.fetchone()
 
     def parse_content(self, date, content):
@@ -50,7 +52,7 @@ class SearchArticles:
                             "type": "image",
                             "data": {
                                 "file": {
-                                    "url": str(i.contents[0])
+                                    "url": str(i.contents[0].attrs['src'])
                                 },
                                 "caption": "need to be correct parse",
                                 "withBorder": "false",
