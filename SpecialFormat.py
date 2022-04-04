@@ -22,10 +22,11 @@ class SearchArticles:
         self.result = self.cursor.fetchone()
         return self.result
 
-    def execute_all(self,):
-        self.cursor.execute("SELECT content FROM cms_article_content")
-        self.result = self.cursor.fetchall()
-        return self.result
+    def get_article_content_all(self,):
+        self.cursor.execute("""SELECT a.date, ac.content FROM cms_article_content ac
+                            LEFT JOIN cms_articles a on a.article_id = ac.article_id
+                            WHERE a.article_id""")
+        return self.cursor.fetchall()
 
     def get_article_content(self):
         self.cursor.execute("""SELECT a.date, ac.content FROM cms_article_content ac
@@ -34,65 +35,70 @@ class SearchArticles:
         return self.cursor.fetchone()
 
     def parse_content(self, date, content):
-        clr = re.sub(r"[\\\r\\\n]", "", content)
-        data_string = BeautifulSoup(clr, 'lxml')
+        for i in self.get_article_content_all():
 
-        for i in data_string.body:
-            if i.name == 'p':
-                self.list_body.append({
-                        "type": "paragraph",
-                        "data": {
-                            "text": str(i.text),
-                            }
-                })
-            elif i.name == 'figure':
-                try:
-                    self.list_body.append(
-                        {
-                            "type": "image",
+            clr = re.sub(r"[\\\r\\\n]", "", content[1])
+            data_string = BeautifulSoup(clr, 'lxml')
+
+            for i in data_string.body:
+                if i.name == 'p':
+                    self.list_body.append({
+                            "type": "paragraph",
                             "data": {
-                                "file": {
-                                    "url": str(i.contents[0].attrs['src'])
-                                },
-                                "caption": "need to be correct parse",
-                                "withBorder": "false",
-                                "withBackground": "false",
-                                "stretched": "true"
+                                "text": str(i.text),
+                                }
+                    })
+                elif i.name == 'figure':
+                    try:
+                        self.list_body.append(
+                            {
+                                "type": "image",
+                                "data": {
+                                    "file": {
+                                        "url": str(i.contents[0].attrs['src'])
+                                    },
+                                    "caption": "need to be correct parse",
+                                    "withBorder": "false",
+                                    "withBackground": "false",
+                                    "stretched": "true"
+                                }
                             }
-                        }
-                                          )
-                except IndexError:
-                    print(f'отсутсвует значение{i}')
-            elif i.name == 'h2':
-                self.list_body.append(
-                        {
+                                              )
+                    except IndexError:
+                        print(f'отсутсвует значение{i}')
+                elif i.name == 'h2':
+                    self.list_body.append(
+                            {
                             "type": "header",
                             "data": {
                                 "text": str(i.text),
                                 "level": 2
                             }
                         }
-                )
-            else:
+                    )
+                else:
                 #self.list_body.append({f'"type" :unknown tag': i.text})
-                pass
+                    pass
 
-        self.article_body.update(
-            {
-                "time":  date,
-                "blocks": self.list_body,
-                "version": "0.01"
-             }
-        )
+            self.article_body.update(
+                {
+                  "time":  date,
+                  "blocks": self.list_body,
+                   "version": "0.01"
+                }
+                )
 
-        return self.article_body
+            return self.article_body
 
 #j = json.dumps(list_root)
 
 
-a = SearchArticles('/home/hortus/PycharmProjects/amocrm/app.db')
-result = a.get_article_content()
-test = a.parse_content(date=result[0], content=result[1])
-print(json.dumps(test))
+#a = SearchArticles('/home/hortus/PycharmProjects/amocrm/app.db')
+b = SearchArticles('/home/hortus/PycharmProjects/amocrm/app.db')
+#result = a.get_article_content()
+result2 = b.get_article_content_all()
+#test = a.parse_content(date=result[0], content=result[1])
+test2 = b.parse_content(date=result2[0], content=result2[1])
+print(json.dumps(test2))
 
 
