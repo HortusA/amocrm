@@ -1,42 +1,34 @@
-from pathlib import Path
 import os
-from config import *
+import shutil
+
+path_root = '/home/hortus/Документы/leads/'
 
 
 class Sort:
     def __init__(self):
         self.path_root = path_root
-        self.path_end = path_end
-        self.path_beckap = path_beckap
+        self.list_all_folder = ''
 
-    def source(self):
-        self.patch_all = os.listdir(self.path_root)
-        return self.patch_all
+    @property
+    def search(self):
+        self.list_all_folder = os.listdir(self.path_root)
+        list_of_duplicate = []
+        for checked_directory in self.list_all_folder:
+            if '-' in checked_directory:
+                split_directory = (checked_directory.split('-'))
+                if split_directory[0] in self.list_all_folder:
+                    get_files = os.listdir(f'{path_root}/{split_directory[0]}')
+                    for one_directory_file in get_files:
+                        if not os.path.exists(f'{path_root}/{checked_directory}/{one_directory_file}'):
+                            print('Файла {g} будет скопирован')
+                            shutil.copy(f'{path_root}/{split_directory[0]}/{one_directory_file}',
+                                        f'{path_root}/{checked_directory}/{one_directory_file}')
+                        else:
+                            print(f'Файл с именем {one_directory_file} в директории {checked_directory} уже существует')
 
-    def source_not_def(self):
-        list_not_def = []
-        for file_not_def in self.source():
-            if not'-' in file_not_def:
-                list_not_def.append(file_not_def)
-        return list_not_def
-
-    def source_def(self):
-        list_dif = []
-        for s in self.source():
-            if '-' in s:
-                list_dif.append(s)
-        return list_dif
-
-    def source_dubl(self):
-        data_dubl=[]
-        for n in self.source_def():
-            split_data=(n.split('-'))
-            if split_data[0] in self.source_not_def():
-               data_dubl.append(split_data[0])
-        return data_dubl
+                    list_of_duplicate.append(checked_directory)
+        return list_of_duplicate
 
 
 a = Sort()
-print(a.source_not_def())
-print(a.source_def())
-print(a.source_dubl())
+print(a.search)

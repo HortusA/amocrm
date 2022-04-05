@@ -1,4 +1,5 @@
 import json
+import pprint
 import re
 import sqlite3
 
@@ -34,7 +35,7 @@ class SearchArticles:
                             WHERE a.article_id = 7""")
         return self.cursor.fetchone()
 
-    def parse_content(self, date, content):
+    def parse_content(self, content):
         for i in self.get_article_content_all():
 
             clr = re.sub(r"[\\\r\\\n]", "", content[1])
@@ -98,7 +99,9 @@ b = SearchArticles('/home/hortus/PycharmProjects/amocrm/app.db')
 #result = a.get_article_content()
 result2 = b.get_article_content_all()
 #test = a.parse_content(date=result[0], content=result[1])
-test2 = b.parse_content(date=result2[0], content=result2[1])
-print(json.dumps(test2))
 
+
+test2 = b.parse_content()
+print(json.dumps(test2))
+pprint.pprint(test2)
 
