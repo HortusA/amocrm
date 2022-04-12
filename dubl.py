@@ -1,34 +1,39 @@
-import os
+from os import listdir, path
 import shutil
 
-path_root = '/home/hortus/Документы/leads/'
+path_to_leads = '/home/hortus/Документы/leads/'
 
 
-class Sort:
+class CheckingLeads:
     def __init__(self):
-        self.path_root = path_root
-        self.list_all_folder = ''
+        self.path_to_leads = path_to_leads
+        self.list_of_duplicate = []
+        self.list_separated_leads = []
+        self.list_files_in_folder = []
 
     @property
-    def search(self):
-        self.list_all_folder = os.listdir(self.path_root)
-        list_of_duplicate = []
-        for checked_directory in self.list_all_folder:
-            if '-' in checked_directory:
-                split_directory = (checked_directory.split('-'))
-                if split_directory[0] in self.list_all_folder:
-                    get_files = os.listdir(f'{path_root}/{split_directory[0]}')
-                    for one_directory_file in get_files:
-                        if not os.path.exists(f'{path_root}/{checked_directory}/{one_directory_file}'):
-                            print('Файла {g} будет скопирован')
-                            shutil.copy(f'{path_root}/{split_directory[0]}/{one_directory_file}',
-                                        f'{path_root}/{checked_directory}/{one_directory_file}')
-                        else:
-                            print(f'Файл с именем {one_directory_file} в директории {checked_directory} уже существует')
+    def get_list_leads(self):
+        return listdir(self.path_to_leads)
 
-                    list_of_duplicate.append(checked_directory)
-        return list_of_duplicate
+    def get_separated_leads(self):
+        for name_leads in self.get_list_leads:
+            if '-' in name_leads:
+                self.list_separated_leads.append(name_leads.split('-'))
+        return self.list_separated_leads
+
+    def transferring_leads_files(self):
+        for one_leads in self.get_separated_leads():
+            if one_leads[0] in self.get_list_leads:
+                get_files = listdir(f'{path_to_leads}/{one_leads[0]}')
+                for one_file_from_leads in get_files:
+                    path_from_ware = f'{path_to_leads}/{one_leads[0]}/{one_file_from_leads}'
+                    path_ware = f'{path_to_leads}/{one_leads[0]}-{one_leads[1]}/{one_file_from_leads}'
+                    if not path.exists(path_ware):
+                        print(f'Файла {one_file_from_leads} будет скопирован')
+                        shutil.copy(path_from_ware, path_ware)
+                    else:
+                        print(f'Файл {one_file_from_leads} в директории {one_leads[0]}-{one_leads[1]} уже существует')
 
 
-a = Sort()
-print(a.search)
+a = CheckingLeads()
+a.transferring_leads_files()
