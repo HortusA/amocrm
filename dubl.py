@@ -1,5 +1,6 @@
 from os import listdir, path
 import shutil
+import pathlib
 
 path_to_leads = '/home/hortus/Документы/leads/'
 
@@ -24,15 +25,15 @@ class CheckingLeads:
     def transferring_leads_files(self):
         for one_leads in self.get_separated_leads():
             if one_leads[0] in self.get_list_leads:
-                get_files = listdir(f'{path_to_leads}/{one_leads[0]}')
+                get_files = listdir(pathlib.Path(path_to_leads, one_leads[0]))
                 for one_file_from_leads in get_files:
-                    path_from_ware = f'{path_to_leads}/{one_leads[0]}/{one_file_from_leads}'
-                    path_ware = f'{path_to_leads}/{one_leads[0]}-{one_leads[1]}/{one_file_from_leads}'
+                    path_from_ware = (pathlib.Path(path_to_leads, one_leads[0], one_file_from_leads))
+                    path_ware = (pathlib.Path(path_to_leads, '-'.join(one_leads), one_file_from_leads))
                     if not path.exists(path_ware):
                         print(f'Файла {one_file_from_leads} будет скопирован')
                         shutil.copy(path_from_ware, path_ware)
                     else:
-                        print(f'Файл {one_file_from_leads} в директории {one_leads[0]}-{one_leads[1]} уже существует')
+                        print(f'Файл {one_file_from_leads} в директории {("-".join(one_leads))} уже существует')
 
 
 a = CheckingLeads()
