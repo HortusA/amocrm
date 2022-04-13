@@ -14,12 +14,19 @@ class CheckingLeads:
 
     @property
     def get_list_leads(self):
-        return listdir(self.path_to_leads)
+        if path.isdir(self.path_to_leads):
+            return listdir(self.path_to_leads)
+        else:
+            print('путь к каталоку не являться верным')
 
     def get_separated_leads(self):
         for name_leads in self.get_list_leads:
-            if '-' in name_leads:
-                self.list_separated_leads.append(name_leads.split('-'))
+            if path.isdir(pathlib.Path(path_to_leads, name_leads)):
+                if '-' in name_leads:
+                    self.list_separated_leads.append(name_leads.split('-'))
+            else:
+                print(f'Обратите внимание на файл{name_leads}')
+                
         return self.list_separated_leads
 
     def transferring_leads_files(self):
