@@ -4,6 +4,7 @@ import pathlib
 from pathlib import Path
 import os
 import time
+import json
 
 path_to_leads = '/home/hortus/Документы/leads/'
 
@@ -18,10 +19,11 @@ class CheckingLeads:
 
     def write_file(self, name_report):
         name_files = time.strftime("%Y%m%d-%H%M%S")
-        with open(name_files, 'w') as File:
 
-            for i in name_report:
-                File.write(f'{i} ' + '\n')
+        with open(name_files, 'w') as File:
+            for i, j in name_report.items():
+                File.write(f'{i}:\n{j} \n')
+
 
     @property
     def get_list_leads(self):
@@ -32,7 +34,9 @@ class CheckingLeads:
 
     def copy_file(self, dir_def):
         get_files = listdir(pathlib.Path(path_to_leads, '-'.join(dir_def)))
+        self.list_of_duplicate = []
         for file in get_files:
+
             path_from_ware = (pathlib.Path(path_to_leads, '-'.join(dir_def), file))
             path_ware = (pathlib.Path(path_to_leads, dir_def[0], file))
             if not path.exists(path_ware):
@@ -40,13 +44,14 @@ class CheckingLeads:
                     shutil.copy(path_from_ware, path_ware)
                 else:
                     shutil.copytree(path_from_ware, path_ware)
+
                 self.list_of_duplicate.append(
                                 {
-                                    "Исходная директория": path_from_ware,
-                                    "Конечная директория": {
+                                    "Папка назнаяения": (pathlib.Path(path_to_leads, dir_def[0])),
+                                    "Источник": {
                                         "Путь": path_from_ware,
                                         "файл": file,
-                                        "Тип оперции": "Копирование"
+                                        "Результат": "Копирование123"
                                             }
                                 }
                             )
@@ -54,15 +59,20 @@ class CheckingLeads:
             else:
                 self.list_of_duplicate.append(
                                 {
-                                    "Исходная директория": path_from_ware,
-                                    "Конечная директория": {
+                                    "Папка назнаяения": (pathlib.Path(path_to_leads, dir_def[0])),
+                                    "Источник": {
                                         "Путь": path_from_ware,
                                         "файл": file,
-                                        "Тип оперции": "Ошибка. Файл в каталоге присутствует"
+                                        "Результат": "Ошибка копирование"
                                             }
                                 }
                             )
-        self.dict_report.update(self.list_of_duplicate)
+
+        self.dict_report.update(
+                {dir_def[0]:self.list_of_duplicate}
+
+
+            )
 
     def transferring_leads_files(self):
         for dir_in_leads in self.get_list_leads:
@@ -77,17 +87,14 @@ class CheckingLeads:
                             os.makedirs(pathlib.Path(path_to_leads, dir_def[0]))
                             self.list_of_duplicate.append(
                                 {
-                                    "Исходная директория": path_to_leads,
-                                    "Конечная директория": {
-                                        "Путь": pathlib.Path(path_to_leads, dir_def[0]),
-                                        "Директория": dir_def[0],
-                                        "Тип оперции": "Директория отсутствовала и быда создана"
+                                        "Файл": {dir_def[0],{"Тип оперции": "Директория отсутствовала и быда создана"
                                     }
-                                }
+                                }}
                             )
+
                             self.copy_file(dir_def)
 
 
 a = CheckingLeads()
 a.transferring_leads_files()
-a.write_file(a.list_of_duplicate)
+a.write_file(a.dict_report)
