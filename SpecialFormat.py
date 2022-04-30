@@ -6,7 +6,7 @@ import pprint
 import urllib.parse
 import requests
 
-path_to_base = '/home/hortus/PycharmProjects/amocrm/app.db'
+path_to_base = '/home/alex/Документы/amocrm/app.db'
 
 
 class SearchArticles:
@@ -122,7 +122,7 @@ class SearchArticles:
                         }
                     )
 
-            self.article_body.update(
+        self.article_body.update(
                 {
                     "time": date,
                     "blocks": self.list_body,
@@ -134,7 +134,7 @@ class SearchArticles:
         return self.article_body
 
 
-a = SearchArticles('/home/hortus/PycharmProjects/amocrm/app.db')
+a = SearchArticles('/home/alex/Документы/amocrm/app.db')
 result = a.get_article_content()
 test = a.parse_content(date=result[0], content=result[1])
 a.write_file("norm.html", a.protocol)

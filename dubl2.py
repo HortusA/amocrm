@@ -87,7 +87,7 @@ class CheckingLeads:
                             os.makedirs(pathlib.Path(path_to_leads, dir_def[0]))
                             self.list_of_duplicate.append(
                                 {
-                                        "Файл": {dir_def[0],{"Тип оперции": "Директория отсутствовала и быда создана"
+                                        "Файл": {dir_def[0], {"Тип оперции": "Директория отсутствовала и быда создана"
                                     }
                                 }}
                             )

@@ -19,4 +19,3 @@ def test_rec():
     for checked_directory in list_all_folder:
         assert os.access(f'{path_root}{checked_directory}', os.W_OK) == True
 
-def

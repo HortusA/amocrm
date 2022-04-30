@@ -99,5 +99,105 @@ cursor.execute(sqlite_select_query)
 records = cursor.fetchall()
 for st in records:
 
+"""SELECT a.date, ac.content FROM cms_article_content ac
+                            LEFT JOIN cms_articles a on a.article_id = ac.article_id
+                            WHERE a.article_id = 7""")
+
+# caption = (i.find('figcaption'))
+                    # if caption is not None:
+                    #   print(caption.text, '_______________________________________')
+
+                        def search(self):
+        self.list_all_folder = os.listdir(self.path_root)
+        list_of_duplicate = []
+        for checked_directory in self.list_all_folder:
+            if '-' in checked_directory:
+                split_directory = (checked_directory.split('-'))
+                if split_directory[0] in self.list_all_folder:
+                    get_files = os.listdir(f'{path_root}/{split_directory[0]}')
+                    for one_directory_file in get_files:
+                        if not os.path.exists(f'{path_root}/{checked_directory}/{one_directory_file}'):
+                            print('Файла {g} будет скопирован')
+                            shutil.copy(f'{path_root}/{split_directory[0]}/{one_directory_file}',
+                                        f'{path_root}/{checked_directory}/{one_directory_file}')
+                        else:
+                            print(f'Файл с именем {one_directory_file} в директории {checked_directory} уже существует')
+
+                    list_of_duplicate.append(checked_directory)
+        return list_of_duplicate
+
+f'{path_to_leads}/{one_leads[0]}/{one_file_from_leads}'
 
 
+
+
+
+
+
+
+
+
+ def transferring_leads_files(self):
+        for dir_in_leads in self.get_list_leads:
+            if path.isdir(pathlib.Path(path_to_leads, dir_in_leads)) and \
+                    len(os.listdir(pathlib.Path(path_to_leads, dir_in_leads))) != 0:
+                if '-' in dir_in_leads:
+                    dir_def = (dir_in_leads.split('-'))
+                    if dir_def[0] in self.get_list_leads:
+                        get_files = listdir(pathlib.Path(path_to_leads, '-'.join(dir_def)))
+                        for file in get_files:
+                            path_from_ware = (pathlib.Path(path_to_leads, '-'.join(dir_def), file))
+                            path_ware = (pathlib.Path(path_to_leads, dir_def[0], file))
+                            if not path.exists(path_ware):
+                                if path.isfile(pathlib.Path(path_to_leads, path_from_ware)):
+                                    shutil.copy(path_from_ware, path_ware)
+                                else:
+                                    shutil.copytree(path_from_ware, path_ware)
+                                self.list_separated_leads.append(path_from_ware)
+                            else:
+                                self.list_of_duplicate.append(path_from_ware)
+                    else:
+                        if dir_def[0] not in self.get_list_leads:
+                            os.makedirs(pathlib.Path(path_to_leads, dir_def[0]))
+                            get_files = listdir(pathlib.Path(path_to_leads, '-'.join(dir_def)))
+                            for file in get_files:
+                                path_from_ware = (pathlib.Path(path_to_leads, '-'.join(dir_def), file))
+                                path_ware = (pathlib.Path(path_to_leads, dir_def[0], file))
+                                if not path.exists(path_ware):
+                                    if path.isfile(pathlib.Path(path_to_leads, path_from_ware)):
+                                        shutil.copy(path_from_ware, path_ware)
+                                    else:
+                                        shutil.copytree(path_from_ware, path_ware)
+                                    self.list_separated_leads.append(path_from_ware)
+                                else:
+                                    self.list_of_duplicate.append(path_from_ware)
+
+
+                                     File.write('<html>')
+            File.write('<head>')
+            File.write('<<title>Отчет</title>>')
+            File.write('</head>')
+            File.write('<body>')
+            for i in name_report:
+                File.write(f'<p> {i} </p>')
+            File.write('</body>')
+            File.write('</html>')
+
+
+            name_files = time.strftime("%Y%m%d-%H%M%S")
+        with open(f'{name_files}.html', 'w') as File:
+            File.write('<head>')
+            File.write('<<title>Отчет</title>>')
+            File.write('</head>')
+            File.write('<body>')
+            for i in name_report:
+                File.write(f'{i} ' + '\n')
+            File.write('</body>')
+            File.write('</html>')
+
+            @app.route('/uploader', methods = ['GET', 'POST'])
+def upload_file():
+   if requests.method == 'POST':
+      f = requests.files['file']
+      f.save(f.filename)
+      return 'file uploaded successfully'
