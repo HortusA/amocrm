@@ -1,12 +1,11 @@
 import sqlite3
 from flask import Flask, render_template
 from flask_wtf import FlaskForm
-from wtforms import FileField, SubmitField, DateField
+from wtforms import FileField, SubmitField, DateField, validators
 from werkzeug.utils import secure_filename
 import os
 from wtforms.validators import InputRequired
 from openpyxl import *
-
 
 path_to_base = '/home/alex/Документы/amocrm/app.db'
 
@@ -17,18 +16,20 @@ app.config['UPLOAD_FOLDER'] = 'static/files'
 
 class UploadFileForm(FlaskForm):
     file = FileField("file")
-    start = DateField("start", format='%m/%d/%y')
-    end = DateField("end", format='%m/%d/%y')
+    start = DateField("start", format='%Y-%m-%d', validators=(validators.Optional(),))
+    end = DateField("end", format='%Y-%m-%d', validators=(validators.Optional(),))
     submit = SubmitField("Загрузка файла")
 
 
 @app.route('/', methods=['GET', "POST"])
 def home():
     form = UploadFileForm()
+    file = form.file.data
+
     if form.validate_on_submit():
         file = form.file.data
-        start_data = form.start_d.data
-        end_data = form.finish_d.data
+        start_data = form.start.data
+        end_data = form.end.data
         print(end_data)
         file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
                                  secure_filename(file.filename))
@@ -66,15 +67,6 @@ class EmailList:
                                     """)
         res = self.cursor.fetchall()
         return res
-
-
-
-
-
-
-
-
-
 
 
 app.run()

@@ -11,6 +11,11 @@
         {{form.hidden_tag()}}
         <div>{{form.start()}} {{form.end()}}</div>
         {{form.file()}}
+        {% if form.start.errors %}
+                {% for error in form.start.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+        {% endif %}
         {{form.submit()}}
     </form>
 </body>
