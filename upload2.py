@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_wtf import FlaskForm
 from wtforms import FileField, SubmitField, DateField
 from werkzeug.utils import secure_filename
@@ -16,27 +16,29 @@ app.config['UPLOAD_FOLDER'] = 'static/files'
 
 
 class UploadFileForm(FlaskForm):
-    file = FileField("file")
-    start = DateField("start", format='%m/%d/%y')
-    end = DateField("end", format='%m/%d/%y')
+    start_d = DateField("start", format='%m/%d/%y')
+    finish_d = DateField("end", format='%m/%d/%y')
     submit = SubmitField("Загрузка файла")
 
 
 @app.route('/', methods=['GET', "POST"])
 def home():
+
+    return render_template('index2.html')
+
+
+@app.route('/upload', methods=['GET', "POST"])
+def upload():
     form = UploadFileForm()
-    if form.validate_on_submit():
-        file = form.file.data
-        start_data = form.start_d.data
-        end_data = form.finish_d.data
-        print(end_data)
-        file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
-                                 secure_filename(file.filename))
-        file.save(file_path)
-        d = EmailList(file_path)
-        res = d.list_pyxl()
-        return render_template('report.html', form=form, data=res)
-    return render_template('index.html', form=form)
+    start_data = form.start_d.data
+    end_data = form.finish_d.data
+    file = request.files['file']
+    file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
+                             secure_filename(file.filename))
+    file.save(file_path)
+    d = EmailList(file_path)
+    res = d.list_pyxl()
+    return render_template('report.html', form=form, data=res)
 
 
 class EmailList:
