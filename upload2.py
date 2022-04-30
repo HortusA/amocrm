@@ -1,7 +1,7 @@
 import sqlite3
 from flask import Flask, render_template, request
 from flask_wtf import FlaskForm
-from wtforms import FileField, SubmitField, DateField
+from wtforms import FileField, SubmitField, DateField, validators
 from werkzeug.utils import secure_filename
 import os
 from wtforms.validators import InputRequired
@@ -16,8 +16,8 @@ app.config['UPLOAD_FOLDER'] = 'static/files'
 
 
 class UploadFileForm(FlaskForm):
-    start_d = DateField("start", format='%m/%d/%y')
-    finish_d = DateField("end", format='%m/%d/%y')
+    start = DateField("start", format='%Y-%m-%d', validators=(validators.Optional(),))
+    end = DateField("end", format='%Y-%m-%d', validators=(validators.Optional(),))
     submit = SubmitField("Загрузка файла")
 
 
@@ -30,8 +30,9 @@ def home():
 @app.route('/upload', methods=['GET', "POST"])
 def upload():
     form = UploadFileForm()
-    start_data = form.start_d.data
-    end_data = form.finish_d.data
+
+    start_data = form.start.data
+    end_data = form.end.data
     file = request.files['file']
     file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
                              secure_filename(file.filename))
