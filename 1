@@ -201,3 +201,53 @@ def upload_file():
       f = requests.files['file']
       f.save(f.filename)
       return 'file uploaded successfully'
+
+
+
+      @app.route('/search_id', methods=['GET', "POST"])
+def search_in():
+    form = ElasticForm()
+    if form.validate_on_submit():
+        field_form = form.elastic_search.data
+        resp = search_id(field_form)
+        return render_template('search_id.html', form=form, search_result=resp)
+    return render_template('search_id.html', form=form)
+
+
+@app.route('/add_id', methods=['GET', "POST"])
+def add_in():
+    form = ElasticForm()
+
+    if form.validate_on_submit():
+        field_form = form.elastic_search.data
+        id_dic = form.id_search.data
+        resp = add_id(id_dic, field_form)
+        return render_template('add_id.html', form=form, search_result=resp)
+    return render_template('add_id.html', form=form)
+
+
+def get_article_all():
+    cursor.execute("""SELECT a.date, ac.content FROM cms_article_content ac
+                            LEFT JOIN cms_articles a on a.article_id = ac.article_id
+                            WHERE a.article_id""")
+    return cursor.fetchall()
+
+
+def execute_all():
+    cursor.execute("SELECT article_id, content FROM cms_article_content")
+    return cursor.fetchall()
+
+
+def create_index_es():
+    for cont in execute_all():
+        es.index(index='my_index', id=cont[0], document={'text': (cont[1])})
+
+
+def search_id(id_doc):
+    resp = es.get(index='my_index', id=id_doc)
+    return resp
+
+
+def add_id(id_doc, text):
+    resp = es.index(index='my_index', id=id_doc, document={'text': text})
+    return resp

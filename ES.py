@@ -1,18 +1,64 @@
 import sqlite3
-import re
-import requests
-import datetime
-
-from bs4 import BeautifulSoup
+from flask import Flask, render_template
 from elasticsearch import Elasticsearch
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, validators
+from wtforms.validators import DataRequired
+from flask_bootstrap import Bootstrap
 
 es = Elasticsearch('http://192.168.0.111:9200')
 
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret'
+app.config['SESSION_COOKIE_SECURE'] = False
+bootstrap = Bootstrap(app)
 
 path_to_base = '/home/alex/Документы/amocrm/app.db'
 conn = sqlite3.connect(path_to_base)
 cursor = conn.cursor()
 list_body = []
+
+
+class ElasticAddForm(FlaskForm):
+    id_doc = StringField("id", validators=[DataRequired()])
+    elastic_search = StringField("elastic_search", validators=[DataRequired()])
+    submit = SubmitField("ок")
+
+
+class ElasticSearchForm(FlaskForm):
+    elastic_search = StringField("elastik_search", validators=[DataRequired()])
+    submit = SubmitField("ok")
+
+
+@app.route('/', methods=['GET', "POST"])
+def elastic():
+    form = ElasticSearchForm()
+    if form.validate_on_submit():
+        field_form = form.elastic_search.data
+        resp = search_text(field_form)
+        return render_template('elastic.html', form=form, search_result=resp.body['hits']['hits'])
+    return render_template('elastic.html', form=form)
+
+
+@app.route('/add_id', methods=['GET', "POST"])
+def add_id():
+    form = ElasticAddForm()
+    if form.validate_on_submit():
+        field_form = form.elastic_search.data
+        id_d = form.id_doc.data
+        resp = add_id_es(id_d, field_form)
+        return render_template('add_id.html', form=form, search_result=resp)
+    return render_template('add_id.html', form=form)
+
+
+@app.route('/get_id', methods=['GET', "POST"])
+def get_id():
+    form = ElasticSearchForm()
+    if form.validate_on_submit():
+        field_form = form.elastic_search.data
+        resp = get_id_one(field_form)
+        return render_template('search_id.html', form=form, search_result=resp)
+    return render_template('search_id.html', form=form)
 
 
 def get_article_all():
@@ -21,38 +67,32 @@ def get_article_all():
                             WHERE a.article_id""")
     return cursor.fetchall()
 
+
 def execute_all():
-    cursor.execute("SELECT content FROM cms_article_content")
+    cursor.execute("SELECT article_id, content FROM cms_article_content")
     return cursor.fetchall()
 
 
 def create_index_es():
-    count = 0
-    for content in execute_all():
-
-        count += 1
-        es.index(index='my_index', id=count, document={'text': (content)})
-    print(count)
-
-#def search_id():
- #   res = es.get(index="my_index", id=10)
- #   print(res['_source'])
+    for cont in execute_all():
+        es.index(index='my_index', id=cont[0], document={'text': (cont[1])})
 
 
-def search_text():
-    body = {
-
-
-    }
-
-
-    #resp = es.search(index="my_index", query={"match_all": {}})
-    resp = es.search(index="my_index", body={'query': {'match': {'text': 'Китай'}}})
-
+def search_text(text):
+    resp = es.search(index="my_index", body={'query': {'match': {'text': text}}})
     print(resp)
+    return resp
 
 
-create_index_es()
+def add_id_es(id_dic, text):
+    resp = es.index(index="my_index", id=id_dic, document={'text': text})
+    return resp
 
-search_text()
 
+def get_id_one(id_d):
+    resp = es.get(index="my_index", id=id_d)
+    return resp
+
+
+
+app.run()
