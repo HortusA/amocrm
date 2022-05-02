@@ -60,6 +60,15 @@ def get_id():
         return render_template('search_id.html', form=form, search_result=resp)
     return render_template('search_id.html', form=form)
 
+@app.route('/del_id', methods=['GET', "POST"])
+def get_id():
+    form = ElasticSearchForm()
+    if form.validate_on_submit():
+        field_form = form.elastic_search.data
+        resp = del_id_one(field_form)
+        return render_template('delete_id.html', form=form, search_result=resp)
+    return render_template('delete_id.html', form=form)
+
 
 def get_article_all():
     cursor.execute("""SELECT a.date, ac.content FROM cms_article_content ac
@@ -94,5 +103,8 @@ def get_id_one(id_d):
     return resp
 
 
+def del_id_one(id_d):
+    resp = es.get(index="my_index", id=id_d)
+    return resp
 
 app.run()
