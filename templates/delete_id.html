@@ -10,7 +10,8 @@
   Elastic:
    <a href="/">Поиск</a>
    <a href="/search_id">Поиск по ID</a>
-   <a href="/search_id">Удалить статью по ID</a>
+   <a href="/delete_id">Удалить статью по ID</a>
+    <a href="/add_id">Добавить</a>
 </div>
 
 <form method="POST" enctype="multipart/form-data">
@@ -19,7 +20,7 @@
      <h1> {{form.elastic_search(size=132)}}</h1>
 
      {{form.submit()}}
-      {{form.subdel()}}
+
 
  </form>
 {% if hits in search_result %}

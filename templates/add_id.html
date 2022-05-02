@@ -9,14 +9,17 @@
 <div>
   Elastic:
    <a href="/">Поиск</a>
-   <a href="/search_id">Поиск по ID</a>
-   <a href="/search_id">Удалить статью по ID</a>
+   <a href="/search_id">Поиск по ID </a>
+   <a href="/delete_id">Удалить статью по ID </a>
+    <a href="/add_id">Добавить </a>
 </div>
 
 <form method="POST" enctype="multipart/form-data">
        {{form.hidden_tag()}}
-    <h1>Введите ID статьи:</h1>
-     <h1> {{form.elastic_search(size=132)}}</h1>
+    <h1>Введите ID статьи b содержимое:</h1>
+    <h1> {{form.id_doc(size=10)}}</h1>
+    <h1> {{form.elastic_search(size=132)}}</h1>
+
 
      {{form.submit()}}
 

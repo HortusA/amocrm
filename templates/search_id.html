@@ -8,48 +8,24 @@
 <body>
 <div>
   Elastic:
-  <a href="{{ url_for('elastic') }}">Поиск</a>
-
-
-
+   <a href="/">Поиск</a>
+   <a href="/get_id">Поиск по ID </a>
+   <a href="/add_id">Добавить </a>
 </div>
-
-
-
 
 <form method="POST" enctype="multipart/form-data">
        {{form.hidden_tag()}}
-    <h1>Введите id для удаления:</h1>
-     <h1> {{form.elastic_search(size=13)}}</h1>
+    <h1>Введите ID статьи:</h1>
+    <h1> {{form.elastic_search}}</h1>
+
 
      {{form.submit()}}
 
 
  </form>
-<p></p>
- <table class="table table-bordered">
-  <thead>
-    <tr>
-      <th scope="col">Индекс</th>
-      <th scope="col">ID</th>
-      <th scope="col">результат запроса</th>
-      </tr>
-  </thead>
-{% if hits in search_result %}
-
-{% endif %}
 
 
-  <tbody>
-    <tr>
-     <td>{{search_result._index}}</td>
-     <td>{{search_result._id}}</td>
-     <td>{{search_result._source}}</td>
+<p>{{search_result}}</p>
 
-
-    </tr>
-  </tbody>
-
-</table>
 </body>
 </html>
