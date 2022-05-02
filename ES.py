@@ -61,7 +61,7 @@ def get_id():
     return render_template('search_id.html', form=form)
 
 @app.route('/del_id', methods=['GET', "POST"])
-def get_id():
+def del_id():
     form = ElasticSearchForm()
     if form.validate_on_submit():
         field_form = form.elastic_search.data
@@ -104,7 +104,7 @@ def get_id_one(id_d):
 
 
 def del_id_one(id_d):
-    resp = es.get(index="my_index", id=id_d)
+    resp = es.delete(index="my_index", id=id_d)
     return resp
 
 app.run()
