@@ -1,8 +1,9 @@
 import sqlite3
 from flask import Flask, render_template
 from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import NotFoundError
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, validators
+from wtforms import StringField, SubmitField, TextAreaField, IntegerField
 from wtforms.validators import DataRequired
 from flask_bootstrap import Bootstrap
 
@@ -20,13 +21,23 @@ list_body = []
 
 
 class ElasticAddForm(FlaskForm):
-    id_doc = StringField("id", validators=[DataRequired()])
-    elastic_search = StringField("elastic_search", validators=[DataRequired()])
+    id_doc = IntegerField("id", validators=[DataRequired()])
+    elastic_search = TextAreaField("elastic_search", validators=[DataRequired()])
     submit = SubmitField("ок")
 
 
 class ElasticSearchForm(FlaskForm):
     elastic_search = StringField("elastik_search", validators=[DataRequired()])
+    submit = SubmitField("ok")
+
+
+class ElasticSearchIdForm(FlaskForm):
+    elastic_search = IntegerField("elastik_search", validators=[DataRequired()])
+    submit = SubmitField("ok")
+
+
+class ElasticSearchIDForm(FlaskForm):
+    elastic_search = IntegerField("elastik_search", validators=[DataRequired()])
     submit = SubmitField("ok")
 
 
@@ -53,20 +64,26 @@ def add_id():
 
 @app.route('/get_id', methods=['GET', "POST"])
 def get_id():
-    form = ElasticSearchForm()
+    form = ElasticSearchIdForm()
     if form.validate_on_submit():
         field_form = form.elastic_search.data
         resp = get_id_one(field_form)
-        return render_template('search_id.html', form=form, search_result=resp)
+        return render_template('search_id.html', form=form, search_result=resp.body['_source']['text'])
     return render_template('search_id.html', form=form)
+
 
 @app.route('/del_id', methods=['GET', "POST"])
 def del_id():
     form = ElasticSearchForm()
     if form.validate_on_submit():
         field_form = form.elastic_search.data
-        resp = del_id_one(field_form)
-        return render_template('delete_id.html', form=form, search_result=resp)
+
+        try:
+            resp = del_id_one(field_form)
+        except NotFoundError as ex:
+            return f"error {ex}"
+
+        return render_template('delete_id.html', form=form, search_result=resp.body['_id'])
     return render_template('delete_id.html', form=form)
 
 
@@ -107,4 +124,6 @@ def del_id_one(id_d):
     resp = es.delete(index="my_index", id=id_d)
     return resp
 
-app.run()
+
+app.run(debug=True)
+

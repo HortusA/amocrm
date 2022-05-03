@@ -7,17 +7,16 @@
 </head>
 <body>
 <div>
- <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-  <a href="/">Поиск</a>
-   <a> Получить статью по ID </a>
-   <a href="/add_id"> Добавить </a>
-   <a href="/del_id"> Удалить </a>
-</nav>
+  Elastic:
+   <a href="/">Поиск</a>
+   <a href="/get_id">Поиск по ID </a>
+   <a href="/add_id">Добавить </a>
 </div>
 
 <form method="POST" enctype="multipart/form-data">
        {{form.hidden_tag()}}
-    <h5> Ведите ID статьи для поиска: {{form.elastic_search}}</h5>
+    <h1>Введите ID статьи:</h1>
+    <h1> {{form.elastic_search}}</h1>
 
 
      {{form.submit()}}
